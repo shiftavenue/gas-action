@@ -1,0 +1,25 @@
+name: Build image
+
+on:
+  pull_request:
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build-image:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Get latest tag
+        shell: bash
+        run: |
+          latest=$(git describe --abbrev=0 --tags || echo "v0.0.0")
+          echo "LATEST_TAG=latest" >> "$GITHUB_OUTPUT"
+      - name: Get PR labels
+        id: pr-labels
+        uses: joerick/pr-labels-action@v1.0.9
+      - if: contains(steps.pr-labels.outputs.labels, 'new patch release')
+        run: echo '### New version 🚀\n When merging, version xyz will be created' >> $GITHUB_STEP_SUMMARY
