@@ -1,0 +1,26 @@
+name: Google Apps Script Action
+author: '@relusc / @shiftavenue'
+description: GitHub Action that handles common operations for Google Apps Script scripts
+
+runs:
+  using: docker
+  image: Dockerfile
+
+inputs:
+  command:
+    description: 'Specifies the operation that should be performed (e.g. push code, deploy or run script). Currently allowed values are: push, deploy, run'
+    required: true
+  access-token:
+    description: 'OAuth2 access token associated with the Google Cloud account/user used for this action'
+    required: true
+  project-id:
+    description: 'Apps Script project ID in which the script is located'
+    required: true
+  script-dir:
+    description: 'Directory that contains the script code'
+    required: false
+    default: './'
+  entrypoint:
+    description: 'Entrypoint function of the script used when triggering an execution'
+    required: false
+    default: ''
