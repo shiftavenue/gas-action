@@ -4,7 +4,7 @@ This actions enables the management of [Apps Script](https://www.google.com/scri
 
 - push the code to the Apps Script projects
 - deploy a script
-- trigger execution of a script ONLY if it deployed as an API executable
+- trigger execution of a script (ONLY works if it is deployed as an API executable)
 
 ## Prerequisites
 
