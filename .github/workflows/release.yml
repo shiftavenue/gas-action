@@ -31,12 +31,11 @@ jobs:
         id: get-semver-level
         run: |
           level="patch"
-          echo ${{ github.event.pull_request.labels }}
           all_labels=(${{ steps.pr-labels.outputs.labels }})
-          if [[ ${all_labels[@]} =~ "new minor release" ]]
+          if [[ ${all_labels[@]} =~ " new-minor-version " ]]
           then
             level="minor"
-          elif [[ ${all_labels[@]} =~ "new major release" ]]
+          elif [[ ${all_labels[@]} =~ " new-major-version " ]]
           then
             level="major"
           fi
