@@ -2,6 +2,7 @@ name: Create and publish release
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled, closed]
 
 env:
   REGISTRY: ghcr.io
