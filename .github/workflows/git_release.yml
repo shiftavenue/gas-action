@@ -38,7 +38,7 @@ jobs:
             level="major"
           fi
 
-          if [[ -z $level ]]
+          if [[ ! -z "${level}" ]]
           then
             current_latest_tag=$(git describe --abbrev=0 --tags || echo "v0.0.0")
             echo "Latest tag is $current_latest_tag"
