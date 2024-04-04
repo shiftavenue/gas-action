@@ -32,10 +32,10 @@ jobs:
         run: |
           level="patch"
           all_labels=(${{ steps.pr-labels.outputs.labels }})
-          if [[ ${all_labels[@]} =~ " new-minor-version " ]]
+          if [[ ${all_labels[@]} =~ "new-minor-version" ]]
           then
             level="minor"
-          elif [[ ${all_labels[@]} =~ " new-major-version " ]]
+          elif [[ ${all_labels[@]} =~ "new-major-version" ]]
           then
             level="major"
           fi
