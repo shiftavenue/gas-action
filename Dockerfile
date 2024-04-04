@@ -1,4 +1,5 @@
-FROM golang:1.22 AS builder
+# Use bullseye base image as it has upx available
+FROM golang:1.22-bullseye AS builder
 
 LABEL maintainer="github.com/shiftavenue"
 
@@ -6,8 +7,8 @@ ENV CGO_ENABLED=0 \
     GOOS=linux \
     GOARCH=amd64
 
-RUN apt-get -qq update && \
-    apt-get -yqq install upx
+RUN apt-get -qq update \
+    && apt-get -yqq install upx
 
 COPY . .
 
