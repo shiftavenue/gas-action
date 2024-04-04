@@ -45,6 +45,8 @@ jobs:
           fi
 
           # Set outputs
+          echo "Bump level is $level"
+          echo "Current latest tag is $current_latest_tag"
           echo "current_latest_tag=$current_latest_tag" >> "$GITHUB_OUTPUT"
           echo "level=$level" >> "$GITHUB_OUTPUT"
 
