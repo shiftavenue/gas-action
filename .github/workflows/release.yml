@@ -62,6 +62,7 @@ jobs:
           git push origin ${{ steps.bump-semver.outputs.new_version }}
 
       - name: Print summary
+        if: ${{ steps.bump-semver.outputs.new_version != ''}}
         run: |
           echo '### New version 🚀' >> $GITHUB_STEP_SUMMARY
           echo 'When merging, version ${{ steps.bump-semver.outputs.new_version }} will be created' >> $GITHUB_STEP_SUMMARY
