@@ -1,0 +1,75 @@
+name: Create and publish release
+
+on:
+  pull_request:
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  determine-create-tag:
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.bump-semver.outputs.new_version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Get latest tag
+        id: get-latest-tag
+        run: |
+          tag=$(git describe --abbrev=0 --tags || echo "v0.0.0")
+          echo "Latest tag is $tag"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
+      - name: Get PR labels
+        id: pr-labels
+        uses: joerick/pr-labels-action@v1.0.9
+
+      - name: Get semver bump level
+        id: get-semver-level
+        run: |
+          level="patch"
+          echo ${{ github.event.pull_request.labels }}
+          all_labels=(${{ steps.pr-labels.outputs.labels }})
+          if [[ ${all_labels[@]} =~ "new minor release" ]]
+          then
+            level="minor"
+          elif [[ ${all_labels[@]} =~ "new major release" ]]
+          then
+            level="major"
+          fi
+          echo "level=$level" >> "$GITHUB_OUTPUT"
+
+      - uses: actions-ecosystem/action-bump-semver@v1
+        id: bump-semver
+        with:
+          current_version: ${{ steps.get-latest-tag.outputs.tag }}
+          level: ${{ steps.get-semver-level.outputs.level }}
+
+      - name: Create tag
+        if: github.event.pull_request.merged == 'true'
+        run: |
+          git tag ${{ steps.bump-semver.outputs.new_version }}
+          git push origin ${{ steps.bump-semver.outputs.new_version }}
+
+      - name: Print summary
+        run: |
+          echo '### New version 🚀' >> $GITHUB_STEP_SUMMARY
+          echo 'When merging, version ${{ steps.bump-semver.outputs.new_version }} will be created' >> $GITHUB_STEP_SUMMARY
+
+  create-release:
+    runs-on: ubuntu-latest
+    needs: [determine-create-tag]
+    if: github.event.pull_request.merged == 'true'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.determine-create-tag.outputs.tag }}
+          name: ${{ github.event.pull_request.title }}
+          body: ${{ github.event.pull_request.body }}
