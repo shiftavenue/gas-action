@@ -26,6 +26,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Get latest tag
+        id: latest-tag
         run: |
           latest_tag=$(git describe --abbrev=0 --tags || echo "")
           if [[ ! -z "${latest_tag}" ]]
@@ -43,7 +44,7 @@ jobs:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
             type=ref,event=branch
-            type=semver,pattern={{version}},value=v1.0.0
+            type=semver,pattern={{version}},value=${{ steps.latest-tag.outputs.latest_tag }}
       - name: Build and Push image
         uses: docker/build-push-action@v5
         with:
