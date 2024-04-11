@@ -1,8 +1,8 @@
-name: Build image
+name: Build and Push image
 
 on:
   workflow_run:
-    workflows: [Build]
+    workflows: [Create and publish release]
     types: [completed]
 
 env:
@@ -30,7 +30,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-      - name: Build image
+      - name: Build and Push image
         uses: docker/build-push-action@v5
         with:
           context: .
