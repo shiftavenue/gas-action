@@ -44,7 +44,12 @@ jobs:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
             type=ref,event=branch
+<<<<<<< Updated upstream
             type=semver,pattern={{version}},value=${{ steps.latest-tag.outputs.latest_tag }}
+=======
+            type=ref,event=tag
+            type=semver,pattern={{raw}}
+>>>>>>> Stashed changes
       - name: Build and Push image
         uses: docker/build-push-action@v5
         with:
