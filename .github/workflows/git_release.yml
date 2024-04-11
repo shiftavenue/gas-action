@@ -27,24 +27,26 @@ jobs:
           level=""
           current_latest_tag=""
           all_labels=(${{ steps.pr-labels.outputs.labels }})
-          if [[ ${all_labels[@]} =~ "new-patch-version" ]]
+          if [[ ${all_labels[*]} =~ "new-patch-version" ]]
           then
             level="patch"
-          elif [[ ${all_labels[@]} =~ "new-minor-version" ]]
+          elif [[ ${all_labels[*]} =~ "new-minor-version" ]]
           then
             level="minor"
-          elif [[ ${all_labels[@]} =~ "new-major-version" ]]
+          elif [[ ${all_labels[*]} =~ "new-major-version" ]]
           then
             level="major"
           fi
 
-          if [[ $level -ne "" ]]
+          if [[ ! -z "${level}" ]]
           then
-          current_latest_tag=$(git describe --abbrev=0 --tags || echo "v0.0.0")
+            current_latest_tag=$(git describe --abbrev=0 --tags || echo "v0.0.0")
             echo "Latest tag is $current_latest_tag"
           fi
 
           # Set outputs
+          echo "Bump level is $level"
+          echo "Current latest tag is $current_latest_tag"
           echo "current_latest_tag=$current_latest_tag" >> "$GITHUB_OUTPUT"
           echo "level=$level" >> "$GITHUB_OUTPUT"
 
