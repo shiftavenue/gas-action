@@ -27,13 +27,13 @@ jobs:
           level=""
           current_latest_tag=""
           all_labels=(${{ steps.pr-labels.outputs.labels }})
-          if [[ ${all_labels[*]} =~ "new-patch-version" ]]
+          if [[ ${all_labels[*]} =~ "release-patch" ]]
           then
             level="patch"
-          elif [[ ${all_labels[*]} =~ "new-minor-version" ]]
+          elif [[ ${all_labels[*]} =~ "release-minor" ]]
           then
             level="minor"
-          elif [[ ${all_labels[*]} =~ "new-major-version" ]]
+          elif [[ ${all_labels[*]} =~ "release-major" ]]
           then
             level="major"
           fi
