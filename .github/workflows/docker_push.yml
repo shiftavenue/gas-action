@@ -1,9 +1,9 @@
-name: Build image
+name: Build and Push image
 
 on:
-  workflow_run:
-    workflows: [Build]
-    types: [completed]
+  workflow_dispatch:
+  repository_dispatch:
+    types: [publish_image]
 
 env:
   REGISTRY: ghcr.io
@@ -12,29 +12,51 @@ env:
 jobs:
   push-image:
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' && github.ref_name == 'main'}}
     permissions:
       contents: read
       packages: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Registry login
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Get latest tag
+        id: latest-tag
+        run: |
+          latest_tag=$(git describe --tags $(git rev-list --tags --max-count=1) || echo "")
+          if [[ ! -z "${latest_tag}" ]]
+          then
+            echo "Latest tag is $latest_tag"
+            IFS='.' read -ra tag_parts <<< "$current_latest_tag_full"
+            # Set outputs
+            echo "latest_tag_full=$latest_tag" >> "$GITHUB_OUTPUT"
+            echo "latest_tag_major=${tag_parts[0]}" >> "$GITHUB_OUTPUT"
+            echo "latest_tag_major_minor=${tag_parts[0]}.${tag_parts[1]}" >> "$GITHUB_OUTPUT"
+          else
+            echo "No tag found, aborting"
+            exit 1
+          fi
       - name: Image metadata
         id: meta
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-      - name: Build image
+          tags: |
+            type=ref,event=branch
+            type=semver,pattern={{raw}},value=${{ steps.latest-tag.outputs.latest_tag_full }}
+            type=semver,pattern={{raw}},value=${{ steps.latest-tag.outputs.latest_tag_major }}
+            type=semver,pattern={{raw}},value=${{ steps.latest-tag.outputs.latest_tag_major_minor }}
+      - name: Build and Push image
         uses: docker/build-push-action@v5
         with:
           context: .
           file: ./Dockerfile
-          push: false
+          push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
