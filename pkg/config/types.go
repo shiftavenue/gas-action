@@ -3,7 +3,7 @@ package config
 // String identifiers of all inputs
 const (
 	commandInput     = "command"
-	accessTokenInput = "gcp-access-token"
+	accessTokenInput = "access-token"
 	projectIdInput   = "project-id"
 	scriptDirInput   = "script-dir"
 	entrypointInput  = "entrypoint"

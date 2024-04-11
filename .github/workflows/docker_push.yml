@@ -33,7 +33,11 @@ jobs:
           if [[ ! -z "${latest_tag}" ]]
           then
             echo "Latest tag is $latest_tag"
-            echo "latest_tag=$latest_tag" >> "$GITHUB_OUTPUT"
+            tag_parts=$(echo $latest_tag | tr "." "\n")
+            # Set outputs
+            echo "latest_tag_full=$latest_tag" >> "$GITHUB_OUTPUT"
+            echo "latest_tag_major=${tag_parts[0]}" >> "$GITHUB_OUTPUT"
+            echo "latest_tag_major_minor=${tag_parts[0]}.${tag_parts[1]}" >> "$GITHUB_OUTPUT"
           else
             echo "No tag found, aborting"
             exit 1
@@ -45,7 +49,9 @@ jobs:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
             type=ref,event=branch
-            type=semver,pattern={{raw}},value=${{ steps.latest-tag.outputs.latest_tag }}
+            type=semver,pattern={{raw}},value=${{ steps.latest-tag.outputs.latest_tag_full }}
+            type=semver,pattern={{raw}},value=${{ steps.latest-tag.outputs.latest_tag_major }}
+            type=semver,pattern={{raw}},value=${{ steps.latest-tag.outputs.latest_tag_major_minor }}
       - name: Build and Push image
         uses: docker/build-push-action@v5
         with:
