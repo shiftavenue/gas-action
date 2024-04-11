@@ -3,7 +3,7 @@ name: Build and Push image
 on:
   workflow_dispatch:
   repository_dispatch:
-    - publish_image
+    types: [publish_image]
 
 env:
   REGISTRY: ghcr.io
