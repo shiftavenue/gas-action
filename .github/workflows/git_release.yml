@@ -46,6 +46,8 @@ jobs:
             tag_parts=$(echo $current_latest_tag_full | tr "." "\n")
             current_latest_tag_major=${tag_parts[0]}
             current_latest_tag_major_minor=${tag_parts[0]}.${tag_parts[1]}
+            echo "breeeeeee $current_latest_tag_major"
+            echo "braaaaaaa $current_latest_tag_major_minor"
           fi
 
           # Set outputs
