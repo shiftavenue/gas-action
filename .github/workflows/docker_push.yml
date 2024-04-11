@@ -2,9 +2,8 @@ name: Build and Push image
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
+  release:
+    types: [published]
 
 env:
   REGISTRY: ghcr.io
