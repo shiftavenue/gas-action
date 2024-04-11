@@ -1,9 +1,8 @@
 name: Build and Push image
 
 on:
-  workflow_run:
-    workflows: [Create and publish release]
-    types: [completed]
+  release:
+    types: [published]
 
 env:
   REGISTRY: ghcr.io
@@ -12,7 +11,7 @@ env:
 jobs:
   push-image:
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' && github.ref_name == 'main'}}
+    if: ${{ github.ref_name == 'main'}}
     permissions:
       contents: read
       packages: write
@@ -35,6 +34,6 @@ jobs:
         with:
           context: .
           file: ./Dockerfile
-          push: false
+          push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
