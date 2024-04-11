@@ -1,8 +1,9 @@
 name: Build and Push image
 
 on:
-  release:
-    types: [published]
+  push:
+    tags:
+      - v**
 
 env:
   REGISTRY: ghcr.io
@@ -29,6 +30,9 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=semver,pattern={{raw}}
       - name: Build and Push image
         uses: docker/build-push-action@v5
         with:
