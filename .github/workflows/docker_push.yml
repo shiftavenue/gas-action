@@ -1,9 +1,10 @@
 name: Build and Push image
 
 on:
+  workflow_dispatch:
   push:
     tags:
-      - v**
+      - "*"
 
 env:
   REGISTRY: ghcr.io
@@ -12,7 +13,6 @@ env:
 jobs:
   push-image:
     runs-on: ubuntu-latest
-    if: ${{ github.ref_name == 'main'}}
     permissions:
       contents: read
       packages: write
