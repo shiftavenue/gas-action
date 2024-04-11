@@ -2,8 +2,8 @@ name: Build and Push image
 
 on:
   workflow_dispatch:
-  release:
-    types: [published]
+  repository_dispatch:
+    - publish_image
 
 env:
   REGISTRY: ghcr.io
@@ -30,7 +30,7 @@ jobs:
           latest_tag=$(git describe --abbrev=0 --tags || echo "")
           if [[ ! -z "${latest_tag}" ]]
           then
-            echo "Latest tag is $current_latest_tag"
+            echo "Latest tag is $latest_tag"
             echo "latest_tag=$latest_tag" >> "$GITHUB_OUTPUT"
           else
             echo "No tag found, aborting"
