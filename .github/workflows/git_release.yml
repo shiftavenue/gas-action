@@ -43,17 +43,12 @@ jobs:
           if [[ ! -z "${level}" ]]
           then
             current_latest_tag_full=$(git describe --tags $(git rev-list --tags --max-count=1) || echo "v0.0.0")
-            IFS='.' read -ra tag_parts <<< "$current_latest_tag_full"
-            current_latest_tag_major=${tag_parts[0]}
-            current_latest_tag_major_minor=${tag_parts[0]}.${tag_parts[1]}
           fi
 
           # Set outputs
           echo "Bump level is $level"
           echo "Current latest tag is $current_latest_tag_full"
           echo "current_latest_tag_full=$current_latest_tag_full" >> "$GITHUB_OUTPUT"
-          echo "current_latest_tag_major=$current_latest_tag_major" >> "$GITHUB_OUTPUT"
-          echo "current_latest_tag_major_minor=$current_latest_tag_major_minor" >> "$GITHUB_OUTPUT"
           echo "level=$level" >> "$GITHUB_OUTPUT"
 
       - uses: actions-ecosystem/action-bump-semver@v1
@@ -66,8 +61,16 @@ jobs:
       - name: Create tag
         if: ${{ github.event.pull_request.merged == true }}
         run: |
+          IFS='.' read -ra tag_parts <<< ${{ steps.bump-semver.outputs.new_version }}
+          tag_major=${tag_parts[0]}
+          tag_major_minor=${tag_parts[0]}.${tag_parts[1]}
+
           git tag -f ${{ steps.bump-semver.outputs.new_version }}
           git push origin ${{ steps.bump-semver.outputs.new_version }}
+          git tag -f $tag_major
+          git push origin $tag_major
+          git tag -f $tag_major_minor
+          git push origin $tag_major_minor
 
       - name: Print summary
         if: ${{ steps.bump-semver.outputs.new_version != ''}}

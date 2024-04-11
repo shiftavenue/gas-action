@@ -33,7 +33,7 @@ jobs:
           if [[ ! -z "${latest_tag}" ]]
           then
             echo "Latest tag is $latest_tag"
-            IFS='.' read -ra tag_parts <<< "$current_latest_tag_full"
+            IFS='.' read -ra tag_parts <<< "$latest_tag"
             # Set outputs
             echo "latest_tag_full=$latest_tag" >> "$GITHUB_OUTPUT"
             echo "latest_tag_major=${tag_parts[0]}" >> "$GITHUB_OUTPUT"
