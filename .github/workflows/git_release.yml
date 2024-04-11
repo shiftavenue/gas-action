@@ -88,4 +88,4 @@ jobs:
       - name: Repository Dispatch
         uses: peter-evans/repository-dispatch@v3
         with:
-          event-type: publish-image
+          event-type: publish_image
