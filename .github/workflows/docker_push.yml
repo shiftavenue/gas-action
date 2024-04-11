@@ -3,8 +3,8 @@ name: Build and Push image
 on:
   workflow_dispatch:
   push:
-    tags:
-      - "*"
+    branches:
+      - main
 
 env:
   REGISTRY: ghcr.io
@@ -25,6 +25,17 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Get latest tag
+        run: |
+          latest_tag=$(git describe --abbrev=0 --tags || echo "")
+          if [[ ! -z "${latest_tag}" ]]
+          then
+            echo "Latest tag is $current_latest_tag"
+            echo "latest_tag=$latest_tag" >> "$GITHUB_OUTPUT"
+          else
+            echo "No tag found, aborting"
+            exit 1
+          fi
       - name: Image metadata
         id: meta
         uses: docker/metadata-action@v5
@@ -32,8 +43,7 @@ jobs:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
             type=ref,event=branch
-            type=ref,event=tag
-            type=semver,pattern={{raw}}
+            type=semver,pattern={{version}},value=v1.0.0
       - name: Build and Push image
         uses: docker/build-push-action@v5
         with:
