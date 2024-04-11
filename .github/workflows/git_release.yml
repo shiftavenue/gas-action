@@ -40,7 +40,7 @@ jobs:
 
           if [[ ! -z "${level}" ]]
           then
-            current_latest_tag=$(git describe --abbrev=0 --tags || echo "v0.0.0")
+            current_latest_tag=$(git describe --tags $(git rev-list --tags --max-count=1) || echo "v0.0.0")
           fi
 
           # Set outputs
