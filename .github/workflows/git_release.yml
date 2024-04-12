@@ -25,7 +25,7 @@ jobs:
         id: get-semver-params
         run: |
           level=""
-          current_latest_tag_full=""
+          current_latest_tag_full="v0.0.0"
           current_latest_major_minor=""
           current_latest_tag_major_minor=""
           all_labels=(${{ steps.pr-labels.outputs.labels }})
@@ -42,7 +42,10 @@ jobs:
 
           if [[ ! -z "${level}" ]]
           then
-            current_latest_tag_full=$(git describe --tags $(git rev-list --tags --max-count=1) || echo "v0.0.0")
+            latest_release=$(gh release ls --json tagName,isLatest --jq ".[] | select(.isLatest == true)")
+            if [[ ! -z "${latest_release}"]]
+              current_latest_tag_full=$(echo $latest_release | jq -r .tagName)
+            fi
           fi
 
           # Set outputs
