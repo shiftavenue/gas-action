@@ -24,7 +24,7 @@ func Run(ctx context.Context, cfg *config.Config) error {
 	deploymentID := ""
 	existingDeployments, err := client.Projects.Deployments.List(cfg.ScriptDir).Do()
 	if err != nil {
-		log.Fatal().Msg(fmt.Sprintf("error while running script: %s", err))
+		return fmt.Errorf("error while listing existing deployments of script: %s", err)
 	}
 
 	for _, d := range existingDeployments.Deployments {
@@ -45,14 +45,14 @@ func Run(ctx context.Context, cfg *config.Config) error {
 
 	run, err := client.Scripts.Run(deploymentID, req).Do()
 	if err != nil {
-		log.Fatal().Msg(fmt.Sprintf("error while running script: %s", err))
+		return fmt.Errorf("error while running script: %s", err)
 	}
 
 	if run.Error != nil {
-		log.Fatal().Msg(fmt.Sprintf("script execution failed with code %d: %s", run.Error.Code, run.Error.Message))
+		return fmt.Errorf("script execution failed with code %d: %s", run.Error.Code, run.Error.Message)
 	}
 
-	log.Info().Msg(fmt.Sprintf("Deployment %s of script project %s executed successfully", deploymentID, cfg.ProjectId))
+	log.Info().Msg(fmt.Sprintf("Execution of deployment %s of script project %s finished successfully", deploymentID, cfg.ProjectId))
 
 	return nil
 }
