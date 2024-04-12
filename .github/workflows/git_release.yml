@@ -23,44 +23,58 @@ jobs:
 
       - name: Get semver parameters
         id: get-semver-params
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           level=""
-          current_latest_tag=""
+          current_latest_tag_full="v0.0.0"
           all_labels=(${{ steps.pr-labels.outputs.labels }})
-          if [[ ${all_labels[*]} =~ "new-patch-version" ]]
+          if [[ ${all_labels[*]} =~ "release-patch" ]]
           then
             level="patch"
-          elif [[ ${all_labels[*]} =~ "new-minor-version" ]]
+          elif [[ ${all_labels[*]} =~ "release-minor" ]]
           then
             level="minor"
-          elif [[ ${all_labels[*]} =~ "new-major-version" ]]
+          elif [[ ${all_labels[*]} =~ "release-major" ]]
           then
             level="major"
           fi
 
           if [[ ! -z "${level}" ]]
           then
-            current_latest_tag=$(git describe --abbrev=0 --tags || echo "v0.0.0")
+            latest_release=$(gh release ls --json tagName,isLatest --jq ".[] | select(.isLatest == true)")
+            if [[ ! -z "${latest_release}" ]]
+            then
+              current_latest_tag_full=$(echo $latest_release | jq -r .tagName)
+            fi
           fi
 
           # Set outputs
           echo "Bump level is $level"
-          echo "Current latest tag is $current_latest_tag"
-          echo "current_latest_tag=$current_latest_tag" >> "$GITHUB_OUTPUT"
+          echo "Current latest tag is $current_latest_tag_full"
+          echo "current_latest_tag_full=$current_latest_tag_full" >> "$GITHUB_OUTPUT"
           echo "level=$level" >> "$GITHUB_OUTPUT"
 
       - uses: actions-ecosystem/action-bump-semver@v1
-        if: ${{ steps.get-semver-params.outputs.current_latest_tag != '' }}
+        if: ${{ steps.get-semver-params.outputs.current_latest_tag_full != '' }}
         id: bump-semver
         with:
-          current_version: ${{ steps.get-semver-params.outputs.current_latest_tag }}
+          current_version: ${{ steps.get-semver-params.outputs.current_latest_tag_full }}
           level: ${{ steps.get-semver-params.outputs.level }}
 
       - name: Create tag
         if: ${{ github.event.pull_request.merged == true }}
         run: |
-          git tag ${{ steps.bump-semver.outputs.new_version }}
+          IFS='.' read -ra tag_parts <<< ${{ steps.bump-semver.outputs.new_version }}
+          tag_major=${tag_parts[0]}
+          tag_major_minor=${tag_parts[0]}.${tag_parts[1]}
+
+          git tag -f ${{ steps.bump-semver.outputs.new_version }}
           git push origin ${{ steps.bump-semver.outputs.new_version }}
+          git tag -f $tag_major
+          git push origin $tag_major
+          git tag -f $tag_major_minor
+          git push origin $tag_major_minor
 
       - name: Print summary
         if: ${{ steps.bump-semver.outputs.new_version != ''}}
@@ -72,6 +86,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: [determine-create-tag]
     if: ${{ github.event.pull_request.merged == true && needs.determine-create-tag.outputs.tag != '' }}
+    permissions:
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -82,3 +98,8 @@ jobs:
           tag_name: ${{ needs.determine-create-tag.outputs.tag }}
           name: ${{ github.event.pull_request.title }}
           body: ${{ github.event.pull_request.body }}
+
+      - name: Repository Dispatch
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          event-type: publish_image
