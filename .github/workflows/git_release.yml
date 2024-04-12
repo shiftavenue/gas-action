@@ -23,6 +23,8 @@ jobs:
 
       - name: Get semver parameters
         id: get-semver-params
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           level=""
           current_latest_tag_full="v0.0.0"
