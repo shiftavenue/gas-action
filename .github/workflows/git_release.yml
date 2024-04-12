@@ -56,7 +56,7 @@ jobs:
           echo "level=$level" >> "$GITHUB_OUTPUT"
 
       - uses: actions-ecosystem/action-bump-semver@v1
-        if: ${{ steps.get-semver-params.outputs.current_latest_tag_full != '' }}
+        if: ${{ steps.get-semver-params.outputs.level != '' }}
         id: bump-semver
         with:
           current_version: ${{ steps.get-semver-params.outputs.current_latest_tag_full }}
