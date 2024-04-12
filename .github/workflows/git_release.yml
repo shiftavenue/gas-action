@@ -43,7 +43,7 @@ jobs:
           if [[ ! -z "${level}" ]]
           then
             latest_release=$(gh release ls --json tagName,isLatest --jq ".[] | select(.isLatest == true)")
-            if [[ ! -z "${latest_release}"]]
+            if [[ ! -z "${latest_release}" ]]
               current_latest_tag_full=$(echo $latest_release | jq -r .tagName)
             fi
           fi
