@@ -26,8 +26,6 @@ jobs:
         run: |
           level=""
           current_latest_tag_full="v0.0.0"
-          current_latest_major_minor=""
-          current_latest_tag_major_minor=""
           all_labels=(${{ steps.pr-labels.outputs.labels }})
           if [[ ${all_labels[*]} =~ "release-patch" ]]
           then
