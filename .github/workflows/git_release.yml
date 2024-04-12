@@ -44,6 +44,7 @@ jobs:
           then
             latest_release=$(gh release ls --json tagName,isLatest --jq ".[] | select(.isLatest == true)")
             if [[ ! -z "${latest_release}" ]]
+            then
               current_latest_tag_full=$(echo $latest_release | jq -r .tagName)
             fi
           fi
