@@ -14,7 +14,7 @@ func NewFromInputs(a *githubactions.Action) (*Config, error) {
 	cfg.AccessToken = a.GetInput(accessTokenInput)
 	cfg.ProjectId = a.GetInput(projectIdInput)
 	cfg.ScriptDir = a.GetInput(scriptDirInput)
-	cfg.Entrypoint = a.GetInput(entrypointInput)
+	cfg.Function = a.GetInput(functionInput)
 
 	// Validate
 	if cfg.AccessToken == "" || cfg.ProjectId == "" {

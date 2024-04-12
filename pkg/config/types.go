@@ -6,7 +6,7 @@ const (
 	accessTokenInput = "access-token"
 	projectIdInput   = "project-id"
 	scriptDirInput   = "script-dir"
-	entrypointInput  = "entrypoint"
+	functionInput    = "function"
 )
 
 // Allowed/supported commands
@@ -20,5 +20,5 @@ type Config struct {
 	AccessToken string
 	ProjectId   string
 	ScriptDir   string
-	Entrypoint  string
+	Function    string
 }
