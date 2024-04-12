@@ -22,7 +22,7 @@ func Run(ctx context.Context, cfg *config.Config) error {
 	// Get latest versioned deployment
 	version := int64(1)
 	deploymentID := ""
-	existingDeployments, err := client.Projects.Deployments.List(cfg.ScriptDir).Do()
+	existingDeployments, err := client.Projects.Deployments.List(cfg.ProjectId).Do()
 	if err != nil {
 		return fmt.Errorf("error while listing existing deployments of script: %s", err)
 	}
