@@ -40,7 +40,7 @@ func Run(ctx context.Context, cfg *config.Config) error {
 
 	// Trigger execution
 	req := &script.ExecutionRequest{
-		Function: cfg.Entrypoint,
+		Function: cfg.Function,
 	}
 
 	run, err := client.Scripts.Run(deploymentID, req).Do()

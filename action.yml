@@ -20,7 +20,7 @@ inputs:
     description: 'Directory that contains the script code'
     required: false
     default: './'
-  entrypoint:
-    description: 'Entrypoint function of the script used when triggering an execution'
+  function:
+    description: 'Entrypoint function of the Apps Script script used when triggering an execution'
     required: false
     default: ''
