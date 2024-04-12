@@ -49,7 +49,7 @@ func Deploy(ctx context.Context, cfg *config.Config) error {
 
 	deploymentConf := &script.DeploymentConfig{
 		ScriptId:      cfg.ProjectId,
-		Description:   "Script eployment (deployed by GitHub Actions)",
+		Description:   "Script deployment (deployed by GitHub Actions)",
 		VersionNumber: versionResp.VersionNumber,
 	}
 
