@@ -1,0 +1,45 @@
+name: Deploy Apps Script
+
+# Configures the workflow to run when pushing to your main branch, feel free to change this according to your needs
+on:
+  push:
+    branches:
+      - main
+
+env:
+  # Apps Script project ID
+  APPS_SCRIPT_PROJECT_ID: my-apps-script-project
+
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: "read"
+      # Is necessary to create access tokens
+      id-token: "write"
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Authenticate to GCP using your custom project and service account
+      - uses: google-github-actions/auth@v2
+        id: google-auth
+        with:
+          project_id: my-gcp-project
+          workload_identity_provider: projects/123456789/locations/global/workloadIdentityPools/my-pool/providers/my-provider
+          service_account: my-svc-account@my-gcp-project.iam.gserviceaccount.com
+          # User to be impersonated via domain-wide-delegation, take user for which the Apps Script projects have been created
+          access_token_subject: my-user@example.com
+          token_format: access_token
+          # These access token scopes are mandatory when you want to create a versioned deployment
+          # see https://developers.google.com/apps-script/api/reference/rest/v1/projects.versions/create
+          # and https://developers.google.com/apps-script/api/reference/rest/v1/projects.deployments/create
+          access_token_scopes: "https://www.googleapis.com/auth/script.projects,https://www.googleapis.com/auth/script.deployments"
+
+      - name: Deploy script
+        uses: shiftavenue/gas-action@v0
+        with:
+          # Use push command
+          command: deploy
+          project-id: ${{ env.APPS_SCRIPT_PROJECT_ID }}
+          access-token: ${{ steps.google-auth.outputs.access_token }}

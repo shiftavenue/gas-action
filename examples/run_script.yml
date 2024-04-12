@@ -1,0 +1,47 @@
+name: Run Design Update
+
+# Configures the workflow to run on a schedule feel free to change this according to your needs
+on:
+  schedule:
+    - cron: "0 0 * * *"
+
+env:
+  # Apps Script project ID
+  APPS_SCRIPT_PROJECT_ID: my-apps-script-project
+  # Entrypoint function of the API executable script
+  ENTRY_POINT: my-function
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: "read"
+      # Is necessary to create access tokens
+      id-token: "write"
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Authenticate to GCP using your custom project and service account
+      - uses: google-github-actions/auth@v2
+        id: google-auth
+        with:
+          project_id: my-gcp-project
+          workload_identity_provider: projects/123456789/locations/global/workloadIdentityPools/my-pool/providers/my-provider
+          service_account: my-svc-account@my-gcp-project.iam.gserviceaccount.com
+          # User to be impersonated via domain-wide-delegation, take user for which the Apps Script projects have been created
+          access_token_subject: my-user@example.com
+          token_format: access_token
+          # IMPORTANT: Add all necessary access scopes for your script here
+          # The two scopes added here are at minimum required to trigger an execution of the API executable
+          # Additionally, add all scopes that are necessary for the script's functionality
+          # E.g. when the script is working with Google Slides documents, make sure to add the necessary Google Slides access scopes
+          access_token_scopes: "https://www.googleapis.com/auth/drive,https://www.googleapis.com/auth/script.deployments"
+
+      - name: Run script
+        uses: shiftavenue/gas-action@v0
+        with:
+          command: run
+          project-id: ${{ env.APPS_SCRIPT_PROJECT_ID }}
+          function: ${{ env.ENTRY_POINT }}
+          access-token: ${{ steps.google-auth.outputs.access_token }}
