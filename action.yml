@@ -1,6 +1,9 @@
-name: Google Apps Script Action
+name: Google Apps Script (GAS) Action
 author: '@relusc / @shiftavenue'
 description: GitHub Action that handles common operations for Google Apps Script scripts
+branding:
+  icon: arrow-up
+  color: orange
 
 runs:
   using: docker
