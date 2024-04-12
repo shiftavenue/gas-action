@@ -63,7 +63,7 @@ jobs:
           level: ${{ steps.get-semver-params.outputs.level }}
 
       - name: Create tag
-        if: ${{ github.event.pull_request.merged == true }}
+        if: ${{ github.event.pull_request.merged == true && steps.bump-semver.outputs.new_version != '' }}
         run: |
           IFS='.' read -ra tag_parts <<< ${{ steps.bump-semver.outputs.new_version }}
           tag_major=${tag_parts[0]}
