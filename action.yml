@@ -7,7 +7,7 @@ branding:
 
 runs:
   using: docker
-  image: Dockerfile
+  image: docker://ghcr.io/shiftavenue/gas-action:v0
 
 inputs:
   command:
