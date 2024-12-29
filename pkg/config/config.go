@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"os"
 	"slices"
 
 	"github.com/sethvargo/go-githubactions"
@@ -10,11 +11,20 @@ import (
 func NewFromInputs(a *githubactions.Action) (*Config, error) {
 	cfg := Config{}
 
-	cfg.Command = a.GetInput(commandInput)
-	cfg.AccessToken = a.GetInput(accessTokenInput)
-	cfg.ProjectId = a.GetInput(projectIdInput)
-	cfg.ScriptDir = a.GetInput(scriptDirInput)
-	cfg.Function = a.GetInput(functionInput)
+    command := os.Getenv("GAS_COMMAND")
+    if ( command == "" ) {
+        cfg.Command = a.GetInput(commandInput)
+        cfg.AccessToken = a.GetInput(accessTokenInput)
+        cfg.ProjectId = a.GetInput(projectIdInput)
+        cfg.ScriptDir = a.GetInput(scriptDirInput)
+        cfg.Function = a.GetInput(functionInput)
+    } else {
+        cfg.Command = command
+        cfg.AccessToken = os.Getenv("GAS_ACCESS_TOKEN")
+        cfg.ProjectId = os.Getenv("GAS_PROJECT_ID")
+        cfg.ScriptDir = os.Getenv("GAS_SCRIPT_DIR")
+        cfg.Function = os.Getenv("GAS_FUNCTION")
+    }
 
 	// Validate
 	if cfg.AccessToken == "" || cfg.ProjectId == "" {
