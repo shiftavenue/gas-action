@@ -12,7 +12,7 @@ func NewFromInputs(a *githubactions.Action) (*Config, error) {
 	cfg := Config{}
 
     command := os.Getenv("GAS_COMMAND")
-    if ( command == "" ) {
+    if command == "" {
         cfg.Command = a.GetInput(commandInput)
         cfg.AccessToken = a.GetInput(accessTokenInput)
         cfg.ProjectId = a.GetInput(projectIdInput)
