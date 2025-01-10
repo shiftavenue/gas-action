@@ -13,6 +13,8 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       tag: ${{ steps.bump-semver.outputs.new_version }}
+    permissions:
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
