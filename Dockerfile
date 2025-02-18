@@ -1,5 +1,5 @@
 # Use bullseye base image as it has upx available
-FROM golang:1.22-bullseye AS builder
+FROM golang:1.24-bullseye AS builder
 
 LABEL maintainer="github.com/shiftavenue"
 
