@@ -3,9 +3,7 @@ package commands
 import (
 	"context"
 	"fmt"
-	"io/fs"
 	"os"
-	"path/filepath"
 	"strings"
 
 	"github.com/rs/zerolog/log"
@@ -25,9 +23,17 @@ func Push(ctx context.Context, cfg *config.Config) error {
 	// Get all files that need to be deployed
 	scriptFiles := []*script.File{}
 
-	files, err := getScriptFiles(cfg.ScriptDir)
+	// Get all files in script directory
+	scriptDir, err := os.Open(cfg.ScriptDir)
 	if err != nil {
-		return fmt.Errorf("unable to get all script files: %v", err)
+		return err
+	}
+
+	defer scriptDir.Close()
+
+	files, err := scriptDir.Readdirnames(0)
+	if err != nil {
+		return err
 	}
 
 	for _, file := range files {
@@ -38,9 +44,15 @@ func Push(ctx context.Context, cfg *config.Config) error {
 		}
 
 		// Set file type
-		fileType := "SERVER_JS"
-		if strings.HasSuffix(file, ".json") {
+		fileType := "ENUM_TYPE_UNSPECIFIED"
+
+		switch {
+		case strings.HasSuffix(file, ".js"):
+			fileType = "SERVER_JS"
+		case strings.HasSuffix(file, ".json"):
 			fileType = "JSON"
+		case strings.HasSuffix(file, ".html"):
+			fileType = "HTML"
 		}
 
 		// Add file
@@ -65,19 +77,4 @@ func Push(ctx context.Context, cfg *config.Config) error {
 	log.Info().Msg(fmt.Sprintf("Script %s successfully pushed", updateResp.ScriptId))
 
 	return nil
-}
-
-// Helper function to grab all script files
-func getScriptFiles(root string) ([]string, error) {
-	files := []string{}
-	filepath.WalkDir(root, func(_ string, dir fs.DirEntry, err error) error {
-		if err != nil {
-			return err
-		}
-		if filepath.Ext(dir.Name()) == ".js" || filepath.Ext(dir.Name()) == ".json" {
-			files = append(files, dir.Name())
-		}
-		return nil
-	})
-	return files, nil
 }
