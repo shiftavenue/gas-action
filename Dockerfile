@@ -1,5 +1,4 @@
-# Use bullseye base image as it has upx available
-FROM golang:1.24-bullseye AS builder
+FROM golang:1.27-alpine AS builder
 
 LABEL maintainer="github.com/shiftavenue"
 
@@ -7,15 +6,14 @@ ENV CGO_ENABLED=0 \
     GOOS=linux \
     GOARCH=amd64
 
-RUN apt-get -qq update \
-    && apt-get -yqq install upx
+RUN apk add --no-cache upx ca-certificates
 
 COPY . .
 
 RUN go build -ldflags "-s -w" -o /bin/gas-action ./cmd/gas-action \
     && upx -q -9 /bin/gas-action
 
-RUN echo "nobody:topsecret:65534:65534:Nobody:/:" > /etc_passwd
+RUN echo "nobody:x:65534:65534:Nobody:/:" > /etc_passwd
 
 FROM scratch
 
